@@ -4,6 +4,7 @@ NoteApp is a web application that allows users to create, manage their notes. It
 # Technologies Used
 
 * Java
+* Maven
 * Spring Boot
 * Hibernate
 * PostgreSQL
