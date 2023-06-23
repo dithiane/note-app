@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface NoteService {
     List<NoteDto> getAllNotesByUserId(Long userId);
 
+    List<NoteDto> getAllNotesByBody(String body, Long userId);
+
     @Transactional
     void addNote(NoteDto noteDto, Long userId);
 

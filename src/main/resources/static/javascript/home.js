@@ -2,11 +2,15 @@
 //Cookie
 const cookieArr = document.cookie.split("=")
 const userId = cookieArr[1];
+if (!userId) window.location.replace("http://localhost:8080/login.html");
 console.log(userId)
 
 //DOM Elements
 const submitForm = document.getElementById("note-form")
 const noteContainer = document.getElementById("note-container")
+
+const searchForm = document.getElementById("search-form")
+//const searchContainer = document.getElementById("search-container")
 
 //Modal Elements
 let noteBody = document.getElementById(`note-body`)
@@ -24,6 +28,15 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
 });
+
+
+const handleSearchSubmit = async (e) => {
+     e.preventDefault()
+     let body= document.getElementById("search-input").value.trim()
+     getNotesByBody(body)
+
+     document.getElementById("search-input").value = ''
+}
 
 const handleSubmit = async (e) => {
     e.preventDefault()
@@ -49,6 +62,8 @@ const handleSubmit = async (e) => {
     document.getElementById("note-input").value = ''  
 }
 
+
+
 async function addNote(obj) {
     const response = await fetch(`${baseUrl}user/${userId}`, {
         method: "POST",
@@ -64,6 +79,17 @@ async function addNote(obj) {
 async function getNotes(userId) {
     await fetch(`${baseUrl}user/${userId}`, {
         method: "GET",
+        headers: headers
+    })
+        .then(response => response.json())
+        .then(data => createNoteCards(data))
+        .catch(err => console.error(err))
+}
+
+async function getNotesByBody(body='') {
+    await fetch(`${baseUrl}user/body/${userId}`, {
+        method: "POST",
+        body: body,
         headers: headers
     })
         .then(response => response.json())
@@ -109,8 +135,8 @@ async function handleNoteEdit(noteId){
 
 const createNoteCards = (array) => {
     noteContainer.innerHTML = ''
-    if (array.status === 500) return
-    array?.forEach(obj => {
+    if (!array.length) return
+    array.forEach(obj => {
         let noteCard = document.createElement("div")
         noteCard.classList.add("m-0")
         noteCard.innerHTML = `
@@ -147,6 +173,8 @@ const populateModal = (obj) =>{
 getNotes(userId);
 
 submitForm.addEventListener("submit", handleSubmit)
+
+searchForm.addEventListener("submit", handleSearchSubmit)
 
 updateNoteBtn.addEventListener("click", (e)=>{
     let noteId = e.target.getAttribute('data-note-id')
